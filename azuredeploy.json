@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
@@ -108,7 +108,8 @@
       "metadata": {
         "description": "The number of agents for the cluster.  This value can be from 1 to 100"
       },
-      "type": "int"
+      "type": "int",
+      "defaultValue": 2
     },
     "agentprivateSubnet": {
       "defaultValue": "10.0.0.0/16",
@@ -198,7 +199,8 @@
       "metadata": {
         "description": "The size of the Virtual Machine."
       },
-      "type": "string"
+      "type": "string",
+      "defaultValue": "Standard_A4"
     },
     "agentpublicCount": {
       "allowedValues": [
@@ -306,13 +308,15 @@
       "metadata": {
         "description": "The number of agents for the cluster.  This value can be from 1 to 100"
       },
-      "type": "int"
+      "type": "int",
+        "defaultValue": 2
     },
     "agentpublicEndpointDNSNamePrefix": {
       "metadata": {
         "description": "Sets the Domain name label for the agent pool IP Address.  The concatenation of the domain name label and the regional DNS zone make up the fully qualified domain name associated with the public IP address."
       },
-      "type": "string"
+      "type": "string",
+      "defaultValue": "mycustd"
     },
     "agentpublicSubnet": {
       "defaultValue": "10.1.0.0/16",
@@ -402,7 +406,8 @@
       "metadata": {
         "description": "The size of the Virtual Machine."
       },
-      "type": "string"
+      "type": "string",
+      "defaultValue": "Standard_A4"
     },
     "firstConsecutiveStaticIP": {
       "defaultValue": "172.16.0.5",
@@ -415,7 +420,8 @@
       "metadata": {
         "description": "User name for the Linux Virtual Machines (SSH or Password)."
       },
-      "type": "string"
+      "type": "string",
+      "defaultValue" : "dinor"
     },
     "masterEndpointDNSNamePrefix": {
       "metadata": {
@@ -493,7 +499,8 @@
       "metadata": {
         "description": "The size of the Virtual Machine."
       },
-      "type": "string"
+      "type": "string",
+      "defaultValue": "Standard_A4"
     },
     "nameSuffix": {
       "defaultValue": "33706540",
@@ -506,14 +513,15 @@
       "metadata": {
         "description": "SSH public key used for auth to all Linux machines.  Not Required.  If not set, you must provide a password key."
       },
-      "type": "string"
+      "type": "string",
+      "defaultValue": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCz7gkqOUUUlCObjgevthzsfFEUGPxm/8+tQYqDXQ/Z0aCOB25cvSHepTWPb0fFJ8fCqp/+9mxJg8tR6XY7nliZ8ioH3j3yBphgzPAkPmoX1fEe05TPm3RQQiQiljZPiKhnxnDI9kCyPI/Fp7cmhklEDFN9aMy/0/3Jx87pIktS0KPC9U/WMrtmNr/0LeKva/0+NgvJkm3mcqAFBH3pBVsnVQrGObp7cHXVXZAas6mjhqsTLjs52T1OQkRtilZsjV9kjvD5qU9tfKRVFBLZGIsVZsCGN4+i3R0UfrCRG6EYqezLZMMf5B5jCugD68kEVPSbsccMVijPDbLWmqIlLX45"
     },
     "sourceImageVhdUri": {
       "metadata": {
         "description": "source image uri"
       },
       "type": "string",
-        "defaultValue": ""
+      "defaultValue": "https://007pqzkn75ztrjmagntpri0.blob.core.windows.net/system/Microsoft.Compute/Images/basedcos/dcos-osDisk.6ff742c1-c5e2-423d-a90a-1d1e6665d8af.vhd"
     }
   },
   "variables": {
@@ -551,7 +559,7 @@
     "apiVersionStorage": "2015-06-15",
     "dataStorageAccountPrefixSeed": 97,
     "masterAvailabilitySet": "[concat(variables('orchestratorName'), '-master-availabilitySet-', variables('nameSuffix'))]",
-    "masterCount": 1,
+    "masterCount": 2,
     "masterEndpointDNSNamePrefix": "[tolower(parameters('masterEndpointDNSNamePrefix'))]",
     "masterFirstAddrOctet4": "[variables('masterFirstAddrOctets')[3]]",
     "masterFirstAddrOctets": "[split(parameters('firstConsecutiveStaticIP'),'.')]",
@@ -588,7 +596,7 @@
     "orchestratorName": "dcos",
     "osImageOffer": "UbuntuServer",
     "osImagePublisher": "Canonical",
-    "osImageSKU": "16.04.0-LTS",
+    "storageAccountName": "007pqzkn75ztrjmagntpri0",
     "osImageVersion": "16.04.201606270",
     "sshKeyPath": "[concat('/home/', variables('adminUsername'), '/.ssh/authorized_keys')]",
     "sshRSAPublicKey": "[parameters('sshRSAPublicKey')]",
@@ -861,7 +869,11 @@
         "storageAccountType": "Standard_LRS"
       }
     },
-    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]"
+    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
+    "math": {
+      "modulo0": [ "0", "1", "0", "1", "0", "1", "0", "1", "0", "1", "0", "1", "0", "1", "0", "1", "0", "1", "0", "1", "0", "1", "0", "1", "0", "1", "0", "1", "0", "1", "0", "1", "0", "1", "0", "1" ],
+      "modulo1": [ "1", "2", "3", "0", "1", "2", "3", "1", "2", "0", "1", "2", "0", "1", "2", "0", "1", "2", "0", "1", "2", "0", "1", "2", "0", "1", "2", "0", "1", "2", "0", "1", "2", "0", "1", "2" ]
+    }
   },
   "resources": [
     {
@@ -874,30 +886,10 @@
       "type": "Microsoft.Network/networkSecurityGroups"
     },
     {
-      "apiVersion": "[variables('apiVersionStorage')]",
-      "copy": {
-        "count": "[variables('agentprivateStorageAccountsCount')]",
-        "name": "loop"
-      },
-      "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/', variables('masterPublicIPAddressName'))]"
-      ],
-      "location": "[resourceGroup().location]",
-      "name": "[concat(variables('storageAccountPrefixes')[mod(add(copyIndex(),variables('agentprivateStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('storageAccountPrefixes')[div(add(copyIndex(),variables('agentprivateStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('agentprivateAccountName'))]",
-      "properties": {
-        "accountType": "[variables('vmSizesMap')[variables('agentprivateVMSize')].storageAccountType]"
-      },
-      "type": "Microsoft.Storage/storageAccounts"
-    },
-    {
       "apiVersion": "[variables('apiVersionDefault')]",
       "dependsOn": [
-        "[variables('vnetID')]",
-        "[concat('Microsoft.Storage/storageAccounts/',variables('storageAccountPrefixes')[mod(add(0,variables('agentprivateStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('storageAccountPrefixes')[div(add(0,variables('agentprivateStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('agentprivateAccountName'))]",
-        "[concat('Microsoft.Storage/storageAccounts/',variables('storageAccountPrefixes')[mod(add(1,variables('agentprivateStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('storageAccountPrefixes')[div(add(1,variables('agentprivateStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('agentprivateAccountName'))]",
-        "[concat('Microsoft.Storage/storageAccounts/',variables('storageAccountPrefixes')[mod(add(2,variables('agentprivateStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('storageAccountPrefixes')[div(add(2,variables('agentprivateStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('agentprivateAccountName'))]",
-        "[concat('Microsoft.Storage/storageAccounts/',variables('storageAccountPrefixes')[mod(add(3,variables('agentprivateStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('storageAccountPrefixes')[div(add(3,variables('agentprivateStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('agentprivateAccountName'))]",
-        "[concat('Microsoft.Storage/storageAccounts/',variables('storageAccountPrefixes')[mod(add(4,variables('agentprivateStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('storageAccountPrefixes')[div(add(4,variables('agentprivateStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('agentprivateAccountName'))]"
+        "[variables('vnetID')]"
+       
       ],
       "location": "[resourceGroup().location]",
       "name": "[concat(variables('agentprivateVMNamePrefix'), '-vmss')]",
@@ -943,7 +935,7 @@
             }
           },
           "storageProfile": {
-            
+
             "osDisk": {
               "caching": "ReadOnly",
               "createOption": "FromImage",
@@ -951,14 +943,8 @@
               "osType": "Linux",
               "image": {
                 "uri": "[parameters('sourceImageVhdUri')]"
-              },
-              "vhdContainers": [
-                "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('storageAccountPrefixes')[mod(add(0,variables('agentprivateStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('storageAccountPrefixes')[div(add(0,variables('agentprivateStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('agentprivateAccountName')),variables('apiVersionStorage')).primaryEndpoints.blob,'osdisk')]",
-                "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('storageAccountPrefixes')[mod(add(1,variables('agentprivateStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('storageAccountPrefixes')[div(add(1,variables('agentprivateStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('agentprivateAccountName')),variables('apiVersionStorage')).primaryEndpoints.blob,'osdisk')]",
-                "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('storageAccountPrefixes')[mod(add(2,variables('agentprivateStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('storageAccountPrefixes')[div(add(2,variables('agentprivateStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('agentprivateAccountName')),variables('apiVersionStorage')).primaryEndpoints.blob,'osdisk')]",
-                "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('storageAccountPrefixes')[mod(add(3,variables('agentprivateStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('storageAccountPrefixes')[div(add(3,variables('agentprivateStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('agentprivateAccountName')),variables('apiVersionStorage')).primaryEndpoints.blob,'osdisk')]",
-                "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('storageAccountPrefixes')[mod(add(4,variables('agentprivateStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('storageAccountPrefixes')[div(add(4,variables('agentprivateStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('agentprivateAccountName')),variables('apiVersionStorage')).primaryEndpoints.blob,'osdisk')]"
-              ]
+              }
+              
             }
           }
         }
@@ -1024,22 +1010,6 @@
         ]
       },
       "type": "Microsoft.Network/networkSecurityGroups"
-    },
-    {
-      "apiVersion": "[variables('apiVersionStorage')]",
-      "copy": {
-        "count": "[variables('agentpublicStorageAccountsCount')]",
-        "name": "loop"
-      },
-      "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/', variables('masterPublicIPAddressName'))]"
-      ],
-      "location": "[resourceGroup().location]",
-      "name": "[concat(variables('storageAccountPrefixes')[mod(add(copyIndex(),variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('storageAccountPrefixes')[div(add(copyIndex(),variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('agentpublicAccountName'))]",
-      "properties": {
-        "accountType": "[variables('vmSizesMap')[variables('agentpublicVMSize')].storageAccountType]"
-      },
-      "type": "Microsoft.Storage/storageAccounts"
     },
     {
       "apiVersion": "[variables('apiVersionDefault')]",
@@ -1175,11 +1145,7 @@
       "apiVersion": "[variables('apiVersionDefault')]",
       "dependsOn": [
         "[variables('vnetID')]",
-        "[concat('Microsoft.Storage/storageAccounts/',variables('storageAccountPrefixes')[mod(add(0,variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('storageAccountPrefixes')[div(add(0,variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('agentpublicAccountName'))]",
-        "[concat('Microsoft.Storage/storageAccounts/',variables('storageAccountPrefixes')[mod(add(1,variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('storageAccountPrefixes')[div(add(1,variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('agentpublicAccountName'))]",
-        "[concat('Microsoft.Storage/storageAccounts/',variables('storageAccountPrefixes')[mod(add(2,variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('storageAccountPrefixes')[div(add(2,variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('agentpublicAccountName'))]",
-        "[concat('Microsoft.Storage/storageAccounts/',variables('storageAccountPrefixes')[mod(add(3,variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('storageAccountPrefixes')[div(add(3,variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('agentpublicAccountName'))]",
-        "[concat('Microsoft.Storage/storageAccounts/',variables('storageAccountPrefixes')[mod(add(4,variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('storageAccountPrefixes')[div(add(4,variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('agentpublicAccountName'))]",
+       
         "[concat('Microsoft.Network/loadBalancers/', variables('agentpublicLbName'))]"
       ],
       "location": "[resourceGroup().location]",
@@ -1231,7 +1197,7 @@
             }
           },
           "storageProfile": {
-           
+
             "osDisk": {
               "caching": "ReadOnly",
               "createOption": "FromImage",
@@ -1239,14 +1205,8 @@
               "osType": "Linux",
               "image": {
                 "uri": "[parameters('sourceImageVhdUri')]"
-              },
-              "vhdContainers": [
-                "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('storageAccountPrefixes')[mod(add(0,variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('storageAccountPrefixes')[div(add(0,variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('agentpublicAccountName')),variables('apiVersionStorage')).primaryEndpoints.blob,'osdisk')]",
-                "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('storageAccountPrefixes')[mod(add(1,variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('storageAccountPrefixes')[div(add(1,variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('agentpublicAccountName')),variables('apiVersionStorage')).primaryEndpoints.blob,'osdisk')]",
-                "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('storageAccountPrefixes')[mod(add(2,variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('storageAccountPrefixes')[div(add(2,variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('agentpublicAccountName')),variables('apiVersionStorage')).primaryEndpoints.blob,'osdisk')]",
-                "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('storageAccountPrefixes')[mod(add(3,variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('storageAccountPrefixes')[div(add(3,variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('agentpublicAccountName')),variables('apiVersionStorage')).primaryEndpoints.blob,'osdisk')]",
-                "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('storageAccountPrefixes')[mod(add(4,variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('storageAccountPrefixes')[div(add(4,variables('agentpublicStorageAccountOffset')),variables('storageAccountPrefixesCount'))],variables('agentpublicAccountName')),variables('apiVersionStorage')).primaryEndpoints.blob,'osdisk')]"
-              ]
+              }
+             
             }
           }
         }
@@ -1260,18 +1220,6 @@
         "creationSource": "[concat('acsengine-', variables('agentpublicVMNamePrefix'), '-vmss')]"
       },
       "type": "Microsoft.Compute/virtualMachineScaleSets"
-    },
-    {
-      "apiVersion": "[variables('apiVersionStorage')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/', variables('masterPublicIPAddressName'))]"
-      ],
-      "location": "[resourceGroup().location]",
-      "name": "[variables('masterStorageAccountName')]",
-      "properties": {
-        "accountType": "[variables('vmSizesMap')[variables('masterVMSize')].storageAccountType]"
-      },
-      "type": "Microsoft.Storage/storageAccounts"
     },
     {
       "apiVersion": "[variables('apiVersionStorage')]",
@@ -1331,10 +1279,14 @@
       "type": "Microsoft.Network/virtualNetworks"
     },
     {
-      "apiVersion": "[variables('apiVersionDefault')]",
+      "apiVersion": "2016-04-30-preview",
       "location": "[resourceGroup().location]",
       "name": "[variables('masterAvailabilitySet')]",
-      "properties": { },
+      "properties": {
+        "platformFaultDomainCount": "3",
+        "platformUpdateDomainCount": "5"
+        
+      },
       "type": "Microsoft.Compute/availabilitySets"
     },
     {
@@ -1469,7 +1421,7 @@
       "dependsOn": [
         "[concat('Microsoft.Network/networkInterfaces/', variables('masterVMNamePrefix'), 'nic-', copyIndex())]",
         "[concat('Microsoft.Compute/availabilitySets/',variables('masterAvailabilitySet'))]",
-        "[variables('masterStorageAccountName')]",
+        
         "[variables('masterStorageAccountExhibitorName')]"
       ],
       "location": "[resourceGroup().location]",
@@ -1505,12 +1457,7 @@
           }
         },
         "storageProfile": {
-          "imageReference": {
-            "offer": "[variables('osImageOffer')]",
-            "publisher": "[variables('osImagePublisher')]",
-            "sku": "[variables('osImageSKU')]",
-            "version": "[variables('osImageVersion')]"
-          },
+
           "osDisk": {
             "caching": "ReadWrite",
             "createOption": "FromImage",
@@ -1518,6 +1465,9 @@
             "osType": "Linux",
             "image": {
               "uri": "[parameters('sourceImageVhdUri')]"
+            },
+            "vhd": {
+              "uri": "[concat('https://007pqzkn75ztrjmagntpri0.blob.core.windows.net/','vhds/', variables('math').modulo0[copyIndex()],'-osDisk.vhd')]"
             }
           }
         }
@@ -1528,7 +1478,7 @@
       "type": "Microsoft.Compute/virtualMachines"
     },
     {
-      "apiVersion": "[variables('apiVersionDefault')]",
+      "apiVersion": "2016-04-30-preview",
       "dependsOn": [
         "[concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), sub(variables('masterCount'), 1))]"
       ],
@@ -1538,7 +1488,7 @@
         "autoUpgradeMinorVersion": true,
         "publisher": "Microsoft.OSTCExtensions",
         "settings": {
-          "commandToExecute": "sh -c 'until ping -c1 leader.mesos;do echo waiting for leader.mesos;sleep 15;done;echo leader.mesos up"
+          "commandToExecute": "sh -c 'until ping -c1 leader.mesos;do echo waiting for leader.mesos;sleep 15;done;echo leader.mesos up'"
         },
         "type": "CustomScriptForLinux",
         "typeHandlerVersion": "1.4"
