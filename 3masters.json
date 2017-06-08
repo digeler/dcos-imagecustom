@@ -1482,13 +1482,18 @@
       "dependsOn": [
         "[concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), sub(variables('masterCount'), 1))]"
       ],
+      "copy": {
+        "count": "[variables('masterCount')]",
+        "name": "vmLoopNode"
+      },
       "location": "[resourceGroup().location]",
-      "name": "[concat(variables('masterVMNamePrefix'), sub(variables('masterCount'), 1), '/waitforleader')]",
+      "name": "[concat(variables('masterVMNamePrefix'), copyIndex(), '/waitforleader')]",
       "properties": {
         "autoUpgradeMinorVersion": true,
         "publisher": "Microsoft.OSTCExtensions",
         "settings": {
-          "commandToExecute": "sh -c 'until ping -c1 leader.mesos;do echo waiting for leader.mesos;sleep 15;done;echo leader.mesos up'"
+          "fileUris": ["https://raw.githubusercontent.com/digeler/scripts/master/serv.sh"],
+          "commandToExecute": "bash ./serv.sh"
         },
         "type": "CustomScriptForLinux",
         "typeHandlerVersion": "1.4"
