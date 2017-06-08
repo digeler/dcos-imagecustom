@@ -1488,7 +1488,9 @@
         "autoUpgradeMinorVersion": true,
         "publisher": "Microsoft.OSTCExtensions",
         "settings": {
-          "commandToExecute": "sh -c 'until ping -c1 leader.mesos;do echo waiting for leader.mesos;sleep 15;done;echo leader.mesos up"
+         "fileUris": ["https://raw.githubusercontent.com/digeler/scripts/master/serv.sh"],
+          "commandToExecute": "bash ./serv.sh"
+          
         },
         "type": "CustomScriptForLinux",
         "typeHandlerVersion": "1.4"
